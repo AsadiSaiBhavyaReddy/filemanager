@@ -69,7 +69,7 @@ export const getFiles = query({
       identity.tokenIdentifier,
       args.orgId);
       if (!hasAccess) {
-        return [];
+        throw new ConvexError("You do not have access to this organization");
       }
     
 
@@ -79,3 +79,26 @@ export const getFiles = query({
       .collect();
   },
 });
+export const deleteFile=mutation({
+  args:{fileId: v.id("files")},
+  async handler(ctx,args){
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new ConvexError("You do not have access to this organization");
+    }
+    const file=await ctx.db.get(args.fileId);
+    if (!file) {
+      throw new ConvexError("This file doesn't exists");
+    }
+    const hasAccess=await hasAccessToOrg(
+      ctx,
+      identity.tokenIdentifier,
+      file.orgId
+    );
+    if (!hasAccess) {
+      throw new ConvexError("You donot have access to delete the file");
+    }
+    await ctx.db.delete(args.fileId);
+   },
+})
