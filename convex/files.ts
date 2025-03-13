@@ -105,3 +105,10 @@ export const deleteFile=mutation({
     await ctx.db.delete(args.fileId);
    },
 })
+
+export const getFileUrl = query({
+  args: { storageId: v.id("_storage") },
+  async handler(ctx, args) {
+    return ctx.storage.getUrl(args.storageId);
+  },
+});

@@ -1,13 +1,15 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     remotePatterns: [
       {
+        protocol: "https",
         hostname: "affable-spoonbill-359.convex.cloud",
+        port: "",
+        pathname: "/api/storage/**",
       },
     ],
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
