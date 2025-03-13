@@ -28,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { Doc } from "../../convex/_generated/dataModel";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required").max(200),
@@ -36,7 +37,7 @@ const formSchema = z.object({
     .refine((files) => files.length > 0, "Required"),
 });
 
-export  function    UploadButton() {
+export function UploadButton() {
   const organization = useOrganization();
   const user = useUser();
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
@@ -64,17 +65,34 @@ export  function    UploadButton() {
 
     try {
       const postUrl = await generateUploadUrl();
+      const file = values.file[0];
+
+      if (!file) {
+        toast("Error", { description: "No file selected" });
+        return;
+      }
+
+      const fileType = file.type;
       const result = await fetch(postUrl, {
         method: "POST",
-        headers: { "Content-Type": values.file[0].type },
-        body: values.file[0],
+        headers: { "Content-Type": fileType },
+        body: file,
       });
       const { storageId } = await result.json();
+
+      const types = {
+        "image/png": "image",
+        "application/pdf": "pdf",
+        "text/csv": "csv",
+      } as Record<string, Doc<"files">["type"]>;
+
+      const fileCategory = types[fileType] || "pdf"; // Ensuring a valid type
 
       await createFile({
         name: values.title,
         fileId: storageId,
         orgId,
+        type: fileCategory,
       });
 
       form.reset();
@@ -84,11 +102,10 @@ export  function    UploadButton() {
         description: "Now everyone can view your file",
         style: { backgroundColor: "lightblue", color: "white" },
       });
-
     } catch (err) {
       console.error(err);
       toast("File Upload Failed", {
-        description: "Something went wrong. Please try again."
+        description: "Something went wrong. Please try again.",
       });
     }
   }
@@ -98,10 +115,13 @@ export  function    UploadButton() {
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-bold">Your Files</h1>
 
-        <Dialog open={isFileDialogOpen} onOpenChange={(isOpen) => {
-          setIsFileDialogOpen(isOpen);
-          form.reset();
-        }}>
+        <Dialog
+          open={isFileDialogOpen}
+          onOpenChange={(isOpen) => {
+            setIsFileDialogOpen(isOpen);
+            form.reset();
+          }}
+        >
           <DialogTrigger asChild>
             <Button>Upload File</Button>
           </DialogTrigger>
@@ -141,7 +161,8 @@ export  function    UploadButton() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit"
+                <Button
+                  type="submit"
                   disabled={form.formState.isSubmitting}
                   className="flex gap-1"
                 >

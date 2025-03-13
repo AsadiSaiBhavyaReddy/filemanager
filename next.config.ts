@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        hostname: "affable-spoonbill-359.convex.cloud",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
