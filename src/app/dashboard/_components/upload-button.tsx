@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 import { toast } from "sonner";
 
 import {
@@ -28,7 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { Doc } from "../../convex/_generated/dataModel";
+import { Doc } from "../../../../convex/_generated/dataModel";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required").max(200),
@@ -113,7 +113,7 @@ export function UploadButton() {
   return (
     <main className="container mx-auto pt-12">
       <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-bold">Your Files</h1>
+       
 
         <Dialog
           open={isFileDialogOpen}
@@ -162,6 +162,7 @@ export function UploadButton() {
                   )}
                 />
                 <Button
+                size="icon"
                   type="submit"
                   disabled={form.formState.isSubmitting}
                   className="flex gap-1"

@@ -11,6 +11,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -25,7 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { Doc, Id } from "../../convex/_generated/dataModel";
+import { Doc, Id } from "../../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import {
   FileTextIcon,
@@ -33,11 +34,12 @@ import {
   GaugeIcon,
   ImageIcon,
   MoreVertical,
+  StarIcon,
   TextIcon,
   TrashIcon,
 } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 import { toast } from "sonner";
 import * as Papa from "papaparse"; // ✅ FIXED PAPAPARSE IMPORT
 
@@ -51,6 +53,7 @@ function useFileUrl(storageId: string | undefined) {
 
 function FileCardActions({ file }: { file: Doc<"files"> }) {
   const deleteFile = useMutation(api.files.deleteFile);
+  const toggleFavorite =useMutation(api.files.toggleFavorite);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   return (
@@ -84,6 +87,18 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
           <MoreVertical />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+        <DropdownMenuItem
+            onClick={() => {
+              toggleFavorite({
+                fileId:file._id,
+              })
+            }}
+            className="flex items-center gap-1 cursor-pointer"
+          >
+            <StarIcon className="w-4 h-4" />
+            Favorite
+          </DropdownMenuItem>
+          <DropdownMenuSeparator/>
           <DropdownMenuItem
             onClick={() => setIsConfirmOpen(true)}
             className="flex items-center gap-1 text-red-600 cursor-pointer"
