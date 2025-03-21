@@ -34,6 +34,7 @@ import {
   GaugeIcon,
   ImageIcon,
   MoreVertical,
+  StarHalf,
   StarIcon,
   TextIcon,
   TrashIcon,
@@ -51,7 +52,7 @@ function useFileUrl(storageId: string | undefined) {
   );
 }
 
-function FileCardActions({ file }: { file: Doc<"files"> }) {
+function FileCardActions({ file ,isFavorited}: { file: Doc<"files">; isFavorited:boolean; }) {
   const deleteFile = useMutation(api.files.deleteFile);
   const toggleFavorite =useMutation(api.files.toggleFavorite);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -90,13 +91,22 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
         <DropdownMenuItem
             onClick={() => {
               toggleFavorite({
-                fileId:file._id,
+                fileId: file._id,
+      orgId: file.orgId,
               })
             }}
             className="flex items-center gap-1 cursor-pointer"
           >
-            <StarIcon className="w-4 h-4" />
-            Favorite
+            {isFavorited ? (
+              <div className="flex gap-1 items-center">
+              <StarIcon className="w-4 h-4"/>UnFavorite
+              </div>
+            ):(
+              <div className="flex gap-1 items-center">
+            <StarHalf className="w-4 h-4" />Favorite
+            </div>
+            )}
+          
           </DropdownMenuItem>
           <DropdownMenuSeparator/>
           <DropdownMenuItem
@@ -112,7 +122,7 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
   );
 }
 
-export function FileCard({ file }: { file: Doc<"files"> }) {
+export function FileCard({ file ,favorites}: { file: Doc<"files"> ,favorites:Doc<"favorites">[];}) {
   const fileUrl = useFileUrl(file.fileId);
   const [csvData, setCsvData] = useState<string[][] | null>(null);
 
@@ -147,6 +157,8 @@ export function FileCard({ file }: { file: Doc<"files"> }) {
     link.click();
     document.body.removeChild(link);
   };
+const isFavorited =favorites.some(
+  (favorite) => favorite.fileId ===file._id);
 
   return (
     <Card className="w-full">
@@ -156,7 +168,7 @@ export function FileCard({ file }: { file: Doc<"files"> }) {
           {file.name}
         </CardTitle>
         <div className="absolute top-2 right-2">
-          <FileCardActions file={file} />
+          <FileCardActions  isFavorited={isFavorited} file={file} />
         </div>
       </CardHeader>
 
